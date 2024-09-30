@@ -2,8 +2,7 @@
 
 Sublink Worker 是一个可部署在 Cloudflare Worker 上，小而美的订阅转换工具。可以将各种代理协议的分享 URL 转换为不同客户端可用的订阅链接。同时还提供灵活的自定义规则与API支持。
 
-演示站点：[https://sublink-worker.seven7-ade.workers.dev/](https://sublink-worker.seven7-ade.workers.dev/)
-
+演示站点：[https://sublink-worker.sageer.me](https://sublink-worker.sageer.me)
 ## 功能特点
 
 - 支持协议：ShadowSocks, VMess, VLESS, Hysteria2, Trojan, TUIC
@@ -24,8 +23,6 @@ Sublink Worker 是一个可部署在 Cloudflare Worker 上，小而美的订阅�
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/7Sageer/sublink-worker)
 
-> 注意：9月2日之后，短连接服务由 R2 迁移到 KV，请确保API令牌有对应权限
-
 ## API 文档
 
 详细的 API 文档可以在 [API-doc.md](/doc/API-doc.md) 中找到。
@@ -39,9 +36,10 @@ Sublink Worker 是一个可部署在 Cloudflare Worker 上，小而美的订阅�
 
 ## 最近更新
 
-- 2024-09-15
-  - [#31](https://github.com/7Sageer/sublink-worker/issues/31),[#25](https://github.com/7Sageer/sublink-worker/issues/25) 现在可以自定义短链接路径
-  - 优化了前端显示，简化操作流程
+- 2024-09-28
+  - ([#41](https://github.com/7Sageer/sublink-worker/pull/41)) (by [@Wikeolf](https://github.com/Wikeolf))
+    - 添加自定义域名关键词支持
+    - 现在可以决定自定义规则的顺序
 
 [查看更新日志](/doc/update-log.md)
 

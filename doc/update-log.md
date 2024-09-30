@@ -1,5 +1,24 @@
 # 更新日志
 
+## 2024-09-28
+
+- ([#41](https://github.com/7Sageer/sublink-worker/pull/41)) (by [@Wikeolf](https://github.com/Wikeolf))
+  - 添加自定义域名关键词支持
+  - 现在可以决定自定义规则的顺序
+
+## 2024-09-23
+
+- ([#37](https://github.com/7Sageer/sublink-worker/issues/37)) 修复了VMess和Shadowsocks url中文可能出现乱码的问题
+
+## 2024-09-20
+
+- 在公共站点启用新域名(https://sublink-worker.sageer.me)
+
+## 2024-09-18
+
+- ([#35](https://github.com/7Sageer/sublink-worker/issues/35)) 确保Vmess转换时security选项存在
+- 修复了默认配置缺乏出站的问题
+
 ## 2024-09-15
 
 - ([#31](https://github.com/7Sageer/sublink-worker/issues/31),[#25](https://github.com/7Sageer/sublink-worker/issues/25)) 现在可以自定义短链接路径

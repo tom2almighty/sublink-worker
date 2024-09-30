@@ -29,6 +29,7 @@ async function handleRequest(request) {
         ips: customRuleIPs[index].split(',').map(ip => ip.trim()),
         outbound: customRuleNames[index]
       }));
+      const pin = formData.get('pin');
 
       if (!inputString) {
         return new Response('Missing input parameter', { status: 400 });
@@ -38,8 +39,8 @@ async function handleRequest(request) {
       const rulesToUse = selectedRules.length > 0 ? selectedRules : ['广告拦截', '谷歌服务', '国外媒体', '电报消息'];
 
       const xrayUrl = `${url.origin}/xray?config=${encodeURIComponent(inputString)}`;
-      const singboxUrl = `${url.origin}/singbox?config=${encodeURIComponent(inputString)}&selectedRules=${encodeURIComponent(JSON.stringify(rulesToUse))}&customRules=${encodeURIComponent(JSON.stringify(customRules))}`;
-      const clashUrl = `${url.origin}/clash?config=${encodeURIComponent(inputString)}&selectedRules=${encodeURIComponent(JSON.stringify(rulesToUse))}&customRules=${encodeURIComponent(JSON.stringify(customRules))}`;
+      const singboxUrl = `${url.origin}/singbox?config=${encodeURIComponent(inputString)}&selectedRules=${encodeURIComponent(JSON.stringify(rulesToUse))}&customRules=${encodeURIComponent(JSON.stringify(customRules))}pin=${pin}`;
+      const clashUrl = `${url.origin}/clash?config=${encodeURIComponent(inputString)}&selectedRules=${encodeURIComponent(JSON.stringify(rulesToUse))}&customRules=${encodeURIComponent(JSON.stringify(customRules))}pin=${pin}`;
 
       return new Response(generateHtml(xrayUrl, singboxUrl, clashUrl), {
         headers: { 'Content-Type': 'text/html' }
@@ -48,8 +49,7 @@ async function handleRequest(request) {
       const inputString = url.searchParams.get('config');
       let selectedRules = url.searchParams.get('selectedRules');
       let customRules = url.searchParams.get('customRules');
-
-      console.log(customRules);
+      let pin = url.searchParams.get('pin');
 
       if (!inputString) {
         return new Response('Missing config parameter', { status: 400 });
@@ -75,11 +75,12 @@ async function handleRequest(request) {
         customRules = [];
       }
 
+      // Env pin is use to pin customRules to top
       let configBuilder;
       if (url.pathname.startsWith('/singbox')) {
-        configBuilder = new ConfigBuilder(inputString, selectedRules, customRules);
+        configBuilder = new ConfigBuilder(inputString, selectedRules, customRules, pin);
       } else {
-        configBuilder = new ClashConfigBuilder(inputString, selectedRules, customRules);
+        configBuilder = new ClashConfigBuilder(inputString, selectedRules, customRules, pin);
       }
 
       const config = await configBuilder.build();
@@ -127,8 +128,6 @@ async function handleRequest(request) {
 
       await SUBLINK_KV.put(shortCode, queryString);
       
-      console.log(JSON.stringify(shortCode));
-      
       return new Response(shortCode, {
         headers: { 'Content-Type': 'text/plain' }
       });
@@ -155,8 +154,6 @@ async function handleRequest(request) {
         originalUrl = `${url.origin}/xray${originalParam}`;
       }
 
-      console.log(originalUrl);
-
       if (originalUrl === null) {
         return new Response('Short URL not found', { status: 404 });
       }
@@ -170,7 +167,6 @@ async function handleRequest(request) {
       const finalProxyList = [];
 
       for (const proxy of proxylist) {
-        console.log(proxy);
         if (proxy.startsWith('http://') || proxy.startsWith('https://')) {
           try {
             const response = await fetch(proxy)

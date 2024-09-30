@@ -151,7 +151,7 @@ export function getOutbounds(selectedRuleNames) {
 }
 
 // Helper function to generate rules based on selected rule names
-export function generateRules(selectedRules = [], customRules = []) {
+export function generateRules(selectedRules = [], customRules = [], pin) {
 	if (typeof selectedRules === 'string' && PREDEFINED_RULE_SETS[selectedRules]) {
 	  selectedRules = PREDEFINED_RULE_SETS[selectedRules];
 	}
@@ -174,16 +174,30 @@ export function generateRules(selectedRules = [], customRules = []) {
 	  }
 	});
   
-	if (customRules.length > 0) {
+	if (customRules && customRules.length > 0 && pin !== "true") {
 		customRules.forEach((rule) => {
 		  rules.push({
 			site_rules: rule.site.split(','),
 			ip_rules: rule.ip.split(','),
 			domain_suffix: rule.domain_suffix ? rule.domain_suffix.split(',') : [],
+			domain_keyword: rule.domain_keyword ? rule.domain_keyword.split(',') : [],
 			ip_cidr: rule.ip_cidr ? rule.ip_cidr.split(',') : [],
 			outbound: rule.name
 		  });
 		});
+	}
+	else if (customRules && customRules.length > 0 && pin === "true") {
+		customRules.reverse();
+		customRules.forEach((rule) => {
+			rules.unshift({
+			  site_rules: rule.site.split(','),
+			  ip_rules: rule.ip.split(','),
+			  domain_suffix: rule.domain_suffix ? rule.domain_suffix.split(',') : [],
+			  domain_keyword: rule.domain_keyword ? rule.domain_keyword.split(',') : [],
+			  ip_cidr: rule.ip_cidr ? rule.ip_cidr.split(',') : [],
+			  outbound: rule.name
+			});
+		  });
 	}
   
 	return rules;
@@ -231,30 +245,32 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
     download_detour: '⚡ 自动选择'
   }));
 
-  customRules.forEach(rule => {
-	if(rule.site!=''){
-		rule.site.split(',').forEach(site => {
-			site_rule_sets.push({
-				tag: site.trim(),
-				type: 'remote',
-				format: 'binary',
-				url: `${SITE_RULE_SET_BASE_URL}geosite-${site.trim()}.srs`,
-				download_detour: '⚡ 自动选择'
+  if(customRules){
+	customRules.forEach(rule => {
+		if(rule.site!=''){
+			rule.site.split(',').forEach(site => {
+				site_rule_sets.push({
+					tag: site.trim(),
+					type: 'remote',
+					format: 'binary',
+					url: `${SITE_RULE_SET_BASE_URL}geosite-${site.trim()}.srs`,
+					download_detour: '⚡ 自动选择'
+				});
 			});
-		});
-	}
-	if(rule.ip!=''){
-		rule.ip.split(',').forEach(ip => {
-			ip_rule_sets.push({
-				tag: `${ip.trim()}-ip`,
-				type: 'remote',
-				format: 'binary',
-				url: `${IP_RULE_SET_BASE_URL}geoip-${ip.trim()}.srs`,
-				download_detour: '⚡ 自动选择'
+		}
+		if(rule.ip!=''){
+			rule.ip.split(',').forEach(ip => {
+				ip_rule_sets.push({
+					tag: `${ip.trim()}-ip`,
+					type: 'remote',
+					format: 'binary',
+					url: `${IP_RULE_SET_BASE_URL}geoip-${ip.trim()}.srs`,
+					download_detour: '⚡ 自动选择'
+				});
 			});
-		});
+		}
+	});
 	}
-  });
 
   ruleSets.push(...site_rule_sets, ...ip_rule_sets);
 

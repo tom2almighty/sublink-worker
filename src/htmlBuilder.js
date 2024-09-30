@@ -14,7 +14,9 @@ const generateHead = () => `
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sublink Worker</title>
+    <meta name="description" content="Sublink Worker - 一个强大的订阅链接转换工具,支持多种代理协议和自定义规则">
+    <meta name="keywords" content="Sublink, Worker, 订阅链接, 代理, Xray, SingBox, Clash, V2Ray, 自定义规则, 在线转换, 机场, 节点">
+    <title>Sublink Worker - 轻量高效的订阅链接转换工具</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
@@ -642,6 +644,10 @@ const generateRuleSetSelection = () => `
     </div>
     <div class="mt-4">
       <h4>Custom Rules</h4>
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="crpinToggle">
+        <label class="form-check-label" for="crpinToggle">Pin Custom Rules</label>
+      </div>
       <div id="customRules">
       <!-- Custom rules will be dynamically added here -->
     </div>
@@ -706,6 +712,7 @@ const submitFormFunction = () => `
     // Save form data to localStorage
     localStorage.setItem('inputTextarea', inputString);
     localStorage.setItem('advancedToggle', document.getElementById('advancedToggle').checked);
+    localStorage.setItem('crpinToggle', document.getElementById('crpinToggle').checked);
     saveSelectedRules();
     
     let selectedRules;
@@ -716,18 +723,21 @@ const submitFormFunction = () => `
       selectedRules = Array.from(document.querySelectorAll('input[name="selectedRules"]:checked'))
         .map(checkbox => checkbox.value);
     }
+    
+    let pin = document.getElementById('crpinToggle').checked;
 
     const customRules = Array.from(document.querySelectorAll('.custom-rule')).map(rule => ({
       site: rule.querySelector('input[name="customRuleSite[]"]').value,
       ip: rule.querySelector('input[name="customRuleIP[]"]').value,
       name: rule.querySelector('input[name="customRuleName[]"]').value,
       domain_suffix: rule.querySelector('input[name="customRuleDomainSuffix[]"]').value,
+      domain_keyword: rule.querySelector('input[name="customRuleDomainKeyword[]"]').value,
       ip_cidr: rule.querySelector('input[name="customRuleIPCIDR[]"]').value
     }));
 
     const xrayUrl = \`\${window.location.origin}/xray?config=\${encodeURIComponent(inputString)}\`;
-    const singboxUrl = \`\${window.location.origin}/singbox?config=\${encodeURIComponent(inputString)}&selectedRules=\${encodeURIComponent(JSON.stringify(selectedRules))}&customRules=\${encodeURIComponent(JSON.stringify(customRules))}\`;
-    const clashUrl = \`\${window.location.origin}/clash?config=\${encodeURIComponent(inputString)}&selectedRules=\${encodeURIComponent(JSON.stringify(selectedRules))}&customRules=\${encodeURIComponent(JSON.stringify(customRules))}\`;
+    const singboxUrl = \`\${window.location.origin}/singbox?config=\${encodeURIComponent(inputString)}&selectedRules=\${encodeURIComponent(JSON.stringify(selectedRules))}&customRules=\${encodeURIComponent(JSON.stringify(customRules))}&pin=\${pin}\`;
+    const clashUrl = \`\${window.location.origin}/clash?config=\${encodeURIComponent(inputString)}&selectedRules=\${encodeURIComponent(JSON.stringify(selectedRules))}&customRules=\${encodeURIComponent(JSON.stringify(customRules))}&pin=\${pin}\`;
 
     document.getElementById('xrayLink').value = xrayUrl;
     document.getElementById('singboxLink').value = singboxUrl;
@@ -794,6 +804,7 @@ const submitFormFunction = () => `
     document.getElementById('advancedOptions').classList.remove('show');
     document.querySelectorAll('input[name="selectedRules"]').forEach(checkbox => checkbox.checked = false);
     document.getElementById('predefinedRules').value = 'custom';
+    document.getElementById('crpinToggle').checked = false;
 
     const subscribeLinksContainer = document.getElementById('subscribeLinksContainer');
     subscribeLinksContainer.classList.remove('show');
@@ -852,6 +863,10 @@ const customRuleFunctions = `
       <div class="mb-2">
         <label class="form-label">Domain Suffix</label>
         <input type="text" class="form-control mb-2" name="customRuleDomainSuffix[]" placeholder="Domain Suffix (comma separated)">
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Domain Keyword</label>
+        <input type="text" class="form-control mb-2" name="customRuleDomainKeyword[]" placeholder="Domain Keyword (comma separated)">
       </div>
       <div class="mb-2">
         <label class="form-label">IP CIDR</label>
